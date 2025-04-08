@@ -1,0 +1,39 @@
+services:
+    postgres:
+        image: postgres:12
+        container_name: postgres
+        restart: always
+        environment:
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASS}
+            POSTGRES_DB: ${DB_NAME}
+        labels:
+            - name=postgres
+            - dev.dozzle.group=postgres
+        ports:
+            - '${FORWARD_DB_PORT}:${DB_PORT}'
+        volumes:
+            - postgres:/var/lib/postgresql/data:Z
+        networks:
+            - shared_network
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+            interval: 5s
+            retries: 3
+            start_period: 5s
+        deploy:
+            restart_policy:
+                condition: always
+            resources:
+                limits:
+                    cpus: '0.5'
+                    memory: '128M'
+
+volumes:
+    postgres:
+        name: postgres
+
+networks:
+    shared_network:
+        name: shared_network
+        driver: bridge
