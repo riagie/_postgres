@@ -1,7 +1,7 @@
 services:
     postgres:
-        image: postgres:12
-        container_name: postgres
+        image: postgres:${VERSION:-latest}
+        container_name: postgres-${VERSION:-latest}
         restart: always
         environment:
             POSTGRES_USER: ${DB_USER}
@@ -13,25 +13,25 @@ services:
         ports:
             - '${FORWARD_DB_PORT}:${DB_PORT}'
         volumes:
-            - postgres:/var/lib/postgresql/data:Z
+            - postgres-${VERSION:-latest}:/var/lib/postgresql/data:Z
         networks:
             - shared_network
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
-            interval: 5s
-            retries: 3
-            start_period: 5s
+            interval: 1h
+            retries: 10
+            start_period: 1m
         deploy:
             restart_policy:
                 condition: always
             resources:
                 limits:
-                    cpus: '0.5'
-                    memory: '128M'
+                    cpus: '2'
+                    memory: '2048M'
 
 volumes:
-    postgres:
-        name: postgres
+    postgres-${VERSION:-latest}:
+        name: postgres-${VERSION:-latest}
 
 networks:
     shared_network:
