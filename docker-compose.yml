@@ -1,6 +1,11 @@
 services:
     postgres:
-        image: ${NAME:-postgres}:${VERSION:-latest}
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+                NAME: ${NAME}
+                VERSION: ${VERSION}
         container_name: ${NAME:-postgres}-${VERSION:-latest}
         restart: always
         environment:
