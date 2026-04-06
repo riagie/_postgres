@@ -1,4 +1,5 @@
 ARG NAME
 ARG VERSION
 
+# FROM ${NAME}:${VERSION}
 FROM pgvector/pgvector:pg${VERSION}
