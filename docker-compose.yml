@@ -1,23 +1,23 @@
 services:
     postgres:
-        image: postgres:${VERSION:-latest}
-        container_name: postgres-${VERSION:-latest}
+        image: ${NAME:-postgres}:${VERSION:-latest}
+        container_name: ${NAME:-postgres}-${VERSION:-latest}
         restart: always
         environment:
             POSTGRES_USER: ${DB_USER}
             POSTGRES_PASSWORD: ${DB_PASS}
             POSTGRES_DB: ${DB_NAME}
         labels:
-            - name=postgres
-            - dev.dozzle.group=postgres
+            - name=${NAME:-postgres}
+            - dev.dozzle.group=${NAME:-postgres}
         ports:
             - '${FORWARD_DB_PORT}:${DB_PORT}'
         volumes:
-            - postgres-${VERSION:-latest}:/var/lib/postgresql/data:Z
+            - pgdata:/var/lib/postgresql/data:Z
         networks:
             - shared_network
         healthcheck:
-            test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+            test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME} -p ${DB_PORT}']
             interval: 1h
             retries: 10
             start_period: 1m
@@ -28,10 +28,11 @@ services:
                 limits:
                     cpus: '2'
                     memory: '2048M'
+        command: -p ${DB_PORT}
 
 volumes:
-    postgres-${VERSION:-latest}:
-        name: postgres-${VERSION:-latest}
+    pgdata:
+        name: ${NAME:-postgres}-${VERSION:-latest}
 
 networks:
     shared_network:
